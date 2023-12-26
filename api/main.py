@@ -1,8 +1,9 @@
 from fastapi import FastAPI, File, UploadFile
 from io import BytesIO
-from PIL import Image
+from PIL import Image # Image class from Pillow
 import numpy as np
 import tensorflow as tf
+from fastapi.responses import FileResponse, HTMLResponse
 
 app = FastAPI()
 
@@ -25,7 +26,8 @@ model = tf.keras.models.load_model(MODEL_PATH)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    # return {"message": "Test Message for Tomato Disease Classification model"}
+    return FileResponse('api/index.html')
 
 def read_image(file) -> np.ndarray:
     image = Image.open(BytesIO(file))
@@ -36,7 +38,8 @@ def read_image(file) -> np.ndarray:
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    image = read_image(await file.read())
+    image = read_image(await file.read()) # async routine so we call await.
+                                          # if first request takes time it will be put in suspend mode and second request will be served
     prediction = model.predict(image)
     # prediction = [[10 values]] -> arr in arr so we must use prection[0]
     predicted_class = np.argmax(prediction, axis=1)[0]

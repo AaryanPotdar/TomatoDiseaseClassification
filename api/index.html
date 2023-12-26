@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomato Disease Classifier</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        .upload-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .upload-btn:hover {
+            background-color: #218838;
+        }
+        .image-preview {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            display: none; /* Initially hidden */
+        }
+        .prediction-result {
+            margin-top: 20px;
+            color: #555;
+            font-size: 1.2em;
+        }
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .reset-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tomato Disease Classifier</h1>
+        <p>Upload an image of a tomato plant leaf to diagnose its health.</p>
+        <input type="file" id="file-input" accept="image/*">
+        <button onclick="uploadAndPredict()" class="upload-btn">Classify Leaf</button>
+        <button id="reset-btn" onclick="resetForm()" class="reset-btn" style="display: none;">Test Another Leaf</button>
+        <div id="image-preview" class="image-preview"></div>
+        <div id="prediction-result" class="prediction-result"></div>
+    </div>
+    <script>
+        function uploadAndPredict() {
+            var fileInput = document.getElementById('file-input');
+            var imagePreview = document.getElementById('image-preview');
+            var predictionResult = document.getElementById('prediction-result');
+
+            if (fileInput.files.length > 0) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.style.display = 'block';
+                    imagePreview.innerHTML = '<img src="' + e.target.result + '" alt="Uploaded Image" style="max-width:100%;">';
+                    sendImageToPredict(fileInput.files[0]);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                imagePreview.style.display = 'none';
+                predictionResult.innerHTML = '';
+                alert('Please select an image file.');
+            }
+        }
+
+        function sendImageToPredict(file) {
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayPredictionResult(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function displayPredictionResult(data) {
+            var predictionResult = document.getElementById('prediction-result');
+            predictionResult.innerHTML = '<p>Predicted Class: ' + data.predicted_class + '</p>' +
+                                         '<p>Confidence: ' + (data.confidence * 100).toFixed(2) + '%</p>';
+            document.getElementById('reset-btn').style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('file-input').value = ''; // Reset file input
+            document.getElementById('image-preview').style.display = 'none'; // Hide image preview
+            document.getElementById('image-preview').innerHTML = ''; // Clear image preview
+            document.getElementById('prediction-result').innerHTML = ''; // Clear prediction results
+            document.getElementById('reset-btn').style.display = 'none'
+        }
+
+    </script>
+</body>
+</html>
