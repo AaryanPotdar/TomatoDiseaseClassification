@@ -3,7 +3,7 @@ uvicorn
 python-multipart
 pillow
 matplotlib 
-numpy==1.23.5
+numpy==1.22.0
 typing-extensions==4.6.0
 absl-py==1.0.0
 flatbuffers==23.5.26
