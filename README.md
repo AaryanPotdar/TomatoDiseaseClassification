@@ -4,6 +4,8 @@
 
 The Tomato Disease Classifier is a machine learning-based web application designed to identify various diseases in tomato plants using images of their leaves. Utilizing the ResNet50 model, the application classifies leaf images into several categories indicating the health and potential diseases affecting the plant. This tool aims to assist farmers, gardeners, and agricultural researchers in early disease detection and management.
 
+![image info](pic/img.png)
+
 ## Features
 
 - **Image Upload**: Users can upload images of tomato leaves directly through the web interface.
